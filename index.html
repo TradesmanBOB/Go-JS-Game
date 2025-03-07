@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Go The Game</title>
+</head>
+
+<body>
+  <h1>The Game Go</h1>
+
+  <!-- Current Turn Display -->
+  <div id="turn-display">
+    <p>Current Turn: <span id="current-turn">Black</span></p>
+  </div>
+
+  <!-- Captured Stones Info -->
+  <div id="captured-stones">
+    <p>Captured Black Stones: <span id="captured-black">0</span></p>
+    <p>Captured White Stones: <span id="captured-white">0</span></p>
+  </div>
+
+  <!-- Canvas for Go board -->
+  <canvas id="go-board" width="600" height="600"></canvas>
+
+  <!-- Winner Display -->
+  <div id="winner-display">
+    <p id="winner-message"></p>
+  </div>
+
+  <!-- Reset Button -->
+  <button id="reset-button">Reset Game</button>
+
+  <script src="JavaScript/game.js"></script>
+</body>
+</html>

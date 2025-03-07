@@ -1,0 +1,91 @@
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Set some global styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #888888; /* Light gray background */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    flex-direction: column; /* Stack elements vertically */
+    text-align: center; /* Center the text */
+    gap: 1rem;
+}
+
+h1 {
+    font-size: 4rem;
+    color: #7e96ff;
+}
+
+/* Center the canvas and the current turn info */
+#go-board {
+    border: 1px solid #000;
+    margin-bottom: 20px;
+}
+
+/* Styling for the current turn display */
+#turn-display {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 20px; /* Add a little space between the current turn info and the board */
+}
+
+/* Styling for the captured stones info */
+#captured-stones {
+    color: #fff;
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+}
+
+/* Styling for the reset button */
+button {
+    padding: 10px 20px;
+    font-size: 1.3rem;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Styling for the winner message box */
+#winner-display {
+    position: absolute;
+    top: 50; /* Position it directly over the board */
+    width: 600px; /* Make the box as wide as the board */
+    height: 300px; /* Half the height of the board */
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+    color: #5af700;
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden; /* Initially hidden */
+    opacity: 0; /* Start with invisible */
+    transition: visibility 0.3s, opacity 0.3s; /* Smooth transition */
+}
+
+/* When winner is declared, make the message visible */
+#winner-display.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Styling for the winner message text */
+#winner-message {
+    text-align: center;
+    font-weight: bold;
+}
