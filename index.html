@@ -10,6 +10,20 @@
 <body>
   <h1>The Game Go</h1>
 
+  <!-- AI and Multiplayer Selection -->
+<div id="mode-selection">
+  <p>Choose Opponent:</p>
+  <button id="ai-button">AI Opponent</button>
+  <button id="multiplayer-button">Multiplayer</button>
+  
+  <div id="difficulty-selection" class="hidden">
+    <p>Select AI Difficulty:</p>
+    <button class="difficulty" data-level="easy">Easy</button>
+    <button class="difficulty" data-level="medium">Medium</button>
+    <button class="difficulty" data-level="hard">Hard</button>
+  </div>
+</div>
+
   <!-- Current Turn Display -->
   <div id="turn-display">
     <p>Current Turn: <span id="current-turn">Black</span></p>

@@ -270,4 +270,77 @@ function setup() {
   updateTurnDisplay(); // Show the initial turn
 }
 
+// AI Difficulty Selection
+let aiDifficulty = null;
+let isAIEnabled = false;
+
+// Handle AI & Multiplayer Selection
+document.getElementById('ai-button').addEventListener('click', function () {
+    isAIEnabled = true;
+    document.getElementById('difficulty-selection').classList.remove('hidden');
+});
+
+document.getElementById('multiplayer-button').addEventListener('click', function () {
+    isAIEnabled = false;
+    document.getElementById('difficulty-selection').classList.add('hidden');
+});
+
+// Set AI difficulty
+document.querySelectorAll('.difficulty').forEach(button => {
+    button.addEventListener('click', function () {
+        aiDifficulty = this.getAttribute('data-level');
+        alert("AI set to " + aiDifficulty + " difficulty.");
+    });
+});
+
+// AI makes a move
+function aiMove() {
+    if (!isAIEnabled || currentTurn !== "white") return;
+
+    let move = null;
+
+    if (aiDifficulty === "easy") {
+        move = getRandomMove();
+    } else if (aiDifficulty === "medium") {
+        move = getDefensiveMove();
+    } else if (aiDifficulty === "hard") {
+        move = getStrategicMove();
+    }
+
+    if (move) {
+        placeStone(move.x, move.y);
+    }
+}
+
+// Get a random valid move
+function getRandomMove() {
+    let emptySpaces = [];
+    for (let y = 0; y < BOARD_SIZE; y++) {
+        for (let x = 0; x < BOARD_SIZE; x++) {
+            if (!board[y][x]) emptySpaces.push({ x, y });
+        }
+    }
+    return emptySpaces.length > 0 ? emptySpaces[Math.floor(Math.random() * emptySpaces.length)] : null;
+}
+
+// Get a move that avoids immediate capture (Medium AI)
+function getDefensiveMove() {
+    let move = getRandomMove();
+    return move; // Placeholder, can be improved to analyze nearby stones
+}
+
+// Get a smarter move (Hard AI - Placeholder for now)
+function getStrategicMove() {
+    return getDefensiveMove(); // Will be improved to analyze groups and captures
+}
+
+// Modify the placeStone function to let AI play after the player
+const originalPlaceStone = placeStone;
+placeStone = function (x, y) {
+    originalPlaceStone(x, y);
+    if (isAIEnabled && currentTurn === "white") {
+        setTimeout(aiMove, 500); // AI moves after a short delay
+    }
+};
+
 setup();

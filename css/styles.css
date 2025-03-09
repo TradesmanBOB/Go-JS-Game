@@ -89,3 +89,44 @@ button:hover {
     text-align: center;
     font-weight: bold;
 }
+
+/* AI & Multiplayer Selection Box */
+#mode-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content inside */
+    position: absolute;
+    top: 80px; /* Moves it further down */
+    left: 10%; /* Keeps it positioned toward the left but not too far */
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    text-align: center; /* Center text inside */
+    width: 240px; /* Increased width for breathing room */
+}
+
+/* Difficulty selection container */
+#difficulty-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Adds more spacing between buttons */
+    margin-top: 12px;
+}
+
+/* AI & Multiplayer buttons */
+button.difficulty {
+    width: 100%; /* Make buttons fully clickable */
+    padding: 10px; /* Increased padding for a larger button feel */
+    background: #000000;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1rem; /* Slightly larger text for readability */
+}
+
+button.difficulty:hover {
+    background: #666;
+}
