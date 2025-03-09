@@ -21,7 +21,7 @@ body {
 
 h1 {
     font-size: 4rem;
-    color: #7e96ff;
+    color: #000f51;
 }
 
 /* Center the canvas and the current turn info */
@@ -35,22 +35,22 @@ h1 {
     font-size: 2rem;
     font-weight: bold;
     color: #fff;
-    margin-bottom: 20px; /* Add a little space between the current turn info and the board */
+    margin-bottom: 10px; /* Add a little space between the current turn info and the board */
 }
 
 /* Styling for the captured stones info */
 #captured-stones {
     color: #fff;
     font-size: 1.3rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 /* Styling for the reset button */
 button {
     padding: 10px 20px;
     font-size: 1.3rem;
-    background-color: #333;
-    color: #fff;
+    background-color: #380000;
+    color: #ffacac;
     border: none;
     border-radius: 5px;
     cursor: pointer;
