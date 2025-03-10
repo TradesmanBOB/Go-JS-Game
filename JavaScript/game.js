@@ -8,7 +8,7 @@ const TILE_SIZE = canvas.width / BOARD_SIZE;
 const STONE_RADIUS = TILE_SIZE / 2 - 3;
 
 // Board state to track stone placements (null means empty)
-const board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
+let board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
 
 // Player captured stones count
 let capturedBlack = 0;
@@ -25,9 +25,7 @@ let gameOver = false;
 
 // Mode selection
 let isModeSelected = false;
-let isAIEnabled = false;
 let isMultiplayer = false; // Track multiplayer mode
-let aiDifficulty = null;
 
 // Draw the Go board grid
 function drawBoard() {
@@ -84,12 +82,19 @@ function placeStone(x, y) {
         updateTurnDisplay();
         updateCapturedStones();
         checkWinner();
-
-        if (isAIEnabled && currentTurn === "white" && !gameOver) {
-            setTimeout(aiMove, 500);
-        }
     }
 }
+
+// Add event listener to make the board interactive
+canvas.addEventListener('click', function(event) {
+    if (!isModeSelected || gameOver) return; // Don't allow interaction if game is over or mode is not selected
+
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((event.clientX - rect.left) / TILE_SIZE);
+    const y = Math.floor((event.clientY - rect.top) / TILE_SIZE);
+
+    placeStone(x, y);  // Call placeStone to place a stone at the (x, y) position
+});
 
 // Check for captures
 function checkCaptures(x, y) {
@@ -146,77 +151,61 @@ function getGroup(x, y, color) {
 function checkWinner() {
     if (capturedBlack >= 10) {
         document.getElementById('winner-message').textContent = "White wins!";
-        disableBoard();  // Disable the board once we have a winner
+        gameOver = true;  // Prevent any more moves after a winner is declared
     } else if (capturedWhite >= 10) {
         document.getElementById('winner-message').textContent = "Black wins!";
-        disableBoard();  // Disable the board once we have a winner
+        gameOver = true;  // Prevent any more moves after a winner is declared
     }
 }
 
-// Completely disable board interaction for both player and AI
-function disableBoard() {
-    document.getElementById('winner-display').classList.add('show'); // Show the winner message
-    canvas.style.pointerEvents = "none"; // Block all mouse input
-    gameOver = true; // Prevent AI from making moves
-}
-
-// Enable board input when resetting
-function enableBoard() {
-    document.getElementById('winner-display').classList.remove('show'); // Hide winner display
-    canvas.style.pointerEvents = "auto"; // Allow interactions again
-    gameOver = false; // Reset game state
-}
-
-// AI Move Logic
-function aiMove() {
-    if (!isAIEnabled || currentTurn !== "white" || gameOver) return; // Stop AI if game over
-    let move = getDefensiveMove();
-    if (move) placeStone(move.x, move.y);
-}
-
-// Reset Game
-document.getElementById('reset-button').addEventListener('click', function() {
-    enableBoard(); // Ensure board input is enabled on reset
-
-    for (let y = 0; y < BOARD_SIZE; y++) {
-        for (let x = 0; x < BOARD_SIZE; x++) {
-            board[y][x] = null;
-        }
-    }
+// Reset board to initial state
+function resetBoard() {
+    // Reset board state
+    board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
 
     capturedBlack = 0;
     capturedWhite = 0;
     currentTurn = "black";
     previousBoardState = JSON.stringify(board);
 
-    document.getElementById('winner-message').textContent = '';
-    updateCapturedStones();
+    gameOver = false;  // Ensure the game isn't over when switching modes
     drawBoard();
     drawAllStones();
     updateTurnDisplay();
+}
+
+// Reset Game
+document.getElementById('reset-button').addEventListener('click', function() {
+    resetBoard();
 });
 
 // Mode Selection
 document.getElementById('ai-button').addEventListener('click', function() {
-    isAIEnabled = true;
+    if (isModeSelected && !isMultiplayer) return;  // Prevent multiple clicks
     isModeSelected = true;
     isMultiplayer = false; // Disable multiplayer mode
-    enableBoard(); // Enable board input after mode selection
+    resetBoard(); // Reset the board when switching to AI mode
+    updateModeDisplay();  // Update UI if needed (e.g., difficulty selection or turn indicator)
+
+    // Handle the button highlight
+    document.querySelectorAll('.mode-button').forEach(btn => {
+        btn.classList.remove('selected'); // Remove 'selected' class from all buttons
+    });
+    this.classList.add('selected'); // Add 'selected' class to the clicked button
 });
 
 document.getElementById('multiplayer-button').addEventListener('click', function() {
-    isAIEnabled = false;
+    if (isModeSelected && isMultiplayer) return;  // Prevent multiple clicks
     isModeSelected = true;
     isMultiplayer = true; // Enable multiplayer mode
-    enableBoard(); // Enable board input after mode selection
-});
+    resetBoard(); // Reset the board when switching to multiplayer mode
+    updateModeDisplay();  // Update UI if needed (e.g., difficulty selection or turn indicator)
 
-// Difficulty Selection
-document.querySelectorAll('.difficulty').forEach(button => {
-    button.addEventListener('click', function() {
-        aiDifficulty = button.getAttribute('data-level');
-        console.log("AI Difficulty selected:", aiDifficulty);
+    // Handle the button highlight
+    document.querySelectorAll('.mode-button').forEach(btn => {
+        btn.classList.remove('selected'); // Remove 'selected' class from all buttons
     });
+    this.classList.add('selected'); // Add 'selected' class to the clicked button
 });
 
 // Adding event listeners to the difficulty buttons, so the selected one is highlighted
@@ -229,20 +218,10 @@ document.querySelectorAll('#difficulty-selection .difficulty').forEach(button =>
     });
 });
 
-// JavaScript to toggle 'selected' class when a button is clicked within the #mode-selection div
-document.querySelectorAll('#mode-selection .opponent').forEach(button => {
-    button.addEventListener('click', () => {
-        // Remove 'selected' class from all opponent buttons
-        document.querySelectorAll('#mode-selection .opponent').forEach(btn => btn.classList.remove('selected'));
-        // Add 'selected' class to clicked button
-        button.classList.add('selected');
-    });
-});
-
 // Initialize game
 function setup() {
-  drawBoard();
-  updateTurnDisplay();
+    drawBoard();
+    updateTurnDisplay();
 }
 
 // Calling setup() to initialize the board

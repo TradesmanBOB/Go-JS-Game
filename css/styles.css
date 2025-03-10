@@ -114,6 +114,12 @@ button:hover {
     z-index: 10;
 }
 
+
+.mode-button-selected {
+    background-color: #018306;
+    color: white;
+}
+
 /* Opponent selection container */
 #opponent-selection {
     display: flex;
@@ -170,4 +176,9 @@ button.selected {
     background-color: #018306; /* Green when selected */
     color: white;
     font-weight: bold;
+}
+
+.difficulty.selected {
+    background-color: #018306;
+    color: white;
 }
