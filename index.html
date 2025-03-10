@@ -10,20 +10,6 @@
 <body>
   <h1>The Game Go</h1>
 
-  <!-- AI and Multiplayer Selection -->
-<div id="mode-selection">
-  <p>Choose Opponent:</p>
-  <button id="ai-button">AI Opponent</button>
-  <button id="multiplayer-button">Multiplayer</button>
-  
-  <div id="difficulty-selection" class="hidden">
-    <p>Select AI Difficulty:</p>
-    <button class="difficulty" data-level="easy">Easy</button>
-    <button class="difficulty" data-level="medium">Medium</button>
-    <button class="difficulty" data-level="hard">Hard</button>
-  </div>
-</div>
-
   <!-- Current Turn Display -->
   <div id="turn-display">
     <p>Current Turn: <span id="current-turn">Black</span></p>
@@ -45,6 +31,21 @@
   <div id="winner-display">
     <p id="winner-message"></p>
   </div>
+
+    <!-- AI and Multiplayer Selection -->
+<div id="mode-selection">
+  <p>Choose Opponent:</p>
+  <div id="opponent-selection">
+    <button id="ai-button" class="opponent">AI Opponent</button>
+    <button id="multiplayer-button" class="opponent">Multiplayer</button>
+  </div>
+  <div id="difficulty-selection" class="hidden">
+    <p>Select AI Difficulty:</p>
+    <button class="difficulty" data-level="easy">Easy</button>
+    <button class="difficulty" data-level="medium">Medium</button>
+    <button class="difficulty" data-level="hard">Hard</button>
+  </div>
+</div>
 
   <script src="JavaScript/game.js"></script>
 </body>

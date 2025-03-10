@@ -12,40 +12,40 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; /* Align the content at the top */
     height: 100vh; /* Full viewport height */
     flex-direction: column; /* Stack elements vertically */
     text-align: center; /* Center the text */
-    gap: 1rem;
+    gap: 1rem; /* Space between elements */
+    /* flex-wrap: wrap; Allow elements to wrap in smaller viewports */
+    padding: 1rem; /* Add padding for breathing room */
 }
 
+/* Heading */
 h1 {
-    font-size: 4rem;
-    color: #000f51;
+    font-size: 3rem; /* Reduced font size for responsiveness */
+    color: #000f51; /* Dark blue */
+    flex-shrink: 0; /* Prevent h1 from shrinking */
 }
 
-/* Center the canvas and the current turn info */
-#go-board {
-    border: 1px solid #000;
-    margin-bottom: 20px;
-}
-
-/* Styling for the current turn display */
+/* Current Turn Display */
 #turn-display {
     font-size: 2rem;
     font-weight: bold;
     color: #fff;
     margin-bottom: 10px; /* Add a little space between the current turn info and the board */
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
-/* Styling for the captured stones info */
+/* Captured Stones Info */
 #captured-stones {
     color: #fff;
     font-size: 1.3rem;
     margin-bottom: 1rem;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
-/* Styling for the reset button */
+/* Reset Button */
 button {
     padding: 10px 20px;
     font-size: 1.3rem;
@@ -61,11 +61,23 @@ button:hover {
     background-color: #555;
 }
 
-/* Styling for the winner message box */
+/* Go Board */
+#go-board {
+    border: 1px solid #000;
+    margin-bottom: 20px;
+    width: 100%; /* Make the board responsive */
+    max-width: 570px; /* Limit the max size */
+    flex-grow: 1; /* Allow the board to grow */
+    pointer-events: auto; /* Ensure the board is interactable by default */
+}
+
+/* Winner Display */
 #winner-display {
     position: absolute;
-    top: 50; /* Position it directly over the board */
-    width: 600px; /* Make the box as wide as the board */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Center properly */
+    width: 600px; /* Same width as the board */
     height: 300px; /* Half the height of the board */
     background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
     color: #5af700;
@@ -84,26 +96,29 @@ button:hover {
     opacity: 1;
 }
 
-/* Styling for the winner message text */
-#winner-message {
-    text-align: center;
-    font-weight: bold;
-}
-
-/* AI & Multiplayer Selection Box */
+/* Mode Selection Box */
 #mode-selection {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center content inside */
+    align-items: center;
     position: absolute;
-    top: 80px; /* Moves it further down */
-    left: 10%; /* Keeps it positioned toward the left but not too far */
+    top: 10%; /* Move further down */
+    left: 10%;
     background: rgba(0, 0, 0, 0.5);
     padding: 20px;
     border-radius: 8px;
     color: white;
-    text-align: center; /* Center text inside */
-    width: 240px; /* Increased width for breathing room */
+    text-align: center;
+    width: 15rem;
+    flex-shrink: 0; /* Prevent shrinking */
+    z-index: 10;
+}
+
+/* Opponent selection container */
+#opponent-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 /* Difficulty selection container */
@@ -114,19 +129,45 @@ button:hover {
     margin-top: 12px;
 }
 
-/* AI & Multiplayer buttons */
-button.difficulty {
-    width: 100%; /* Make buttons fully clickable */
-    padding: 10px; /* Increased padding for a larger button feel */
-    background: #000000;
+/* Buttons for selecting opponent */
+button.opponent {
+    width: 100%;
+    padding: 10px;
+    background-color: #000;
     color: white;
     border: none;
     cursor: pointer;
     border-radius: 5px;
     text-align: center;
-    font-size: 1rem; /* Slightly larger text for readability */
+    font-size: 1rem;
+    transition: background-color 0.1s ease;
+}
+
+/* Buttons for selecting difficulty */
+button.difficulty {
+    width: 100%; /* Full width button */
+    padding: 10px;
+    background: #000;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1rem;
+    transition: background-color 0.1s ease;
+}
+
+button.opponent:hover {
+    background: #666;
 }
 
 button.difficulty:hover {
     background: #666;
+}
+
+/* Selected button state */
+button.selected {
+    background-color: #018306; /* Green when selected */
+    color: white;
+    font-weight: bold;
 }
