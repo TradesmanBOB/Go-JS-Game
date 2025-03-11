@@ -26,6 +26,7 @@ let gameOver = false;
 // Mode selection
 let isModeSelected = false;
 let isMultiplayer = false; // Track multiplayer mode
+let currentOpponent = null; // variable to track the current opponent (AI or player)
 
 // Draw the Go board grid
 function drawBoard() {
@@ -184,6 +185,7 @@ document.getElementById('ai-button').addEventListener('click', function() {
     if (isModeSelected && !isMultiplayer) return;  // Prevent multiple clicks
     isModeSelected = true;
     isMultiplayer = false; // Disable multiplayer mode
+    currentOpponent = 'AI'; // Set opponent to AI
     resetBoard(); // Reset the board when switching to AI mode
     updateModeDisplay();  // Update UI if needed (e.g., difficulty selection or turn indicator)
 
@@ -192,12 +194,16 @@ document.getElementById('ai-button').addEventListener('click', function() {
         btn.classList.remove('selected'); // Remove 'selected' class from all buttons
     });
     this.classList.add('selected'); // Add 'selected' class to the clicked button
+
+    // Update opponent selection if needed
+    updateOpponentSelection();
 });
 
 document.getElementById('multiplayer-button').addEventListener('click', function() {
     if (isModeSelected && isMultiplayer) return;  // Prevent multiple clicks
     isModeSelected = true;
     isMultiplayer = true; // Enable multiplayer mode
+    currentOpponent = 'Player'; // Set opponent to Player (Multiplayer)
     resetBoard(); // Reset the board when switching to multiplayer mode
     updateModeDisplay();  // Update UI if needed (e.g., difficulty selection or turn indicator)
 
@@ -206,6 +212,9 @@ document.getElementById('multiplayer-button').addEventListener('click', function
         btn.classList.remove('selected'); // Remove 'selected' class from all buttons
     });
     this.classList.add('selected'); // Add 'selected' class to the clicked button
+
+    // Update the opponent selection if needed
+    updateOpponentSelection();
 });
 
 // Adding event listeners to the difficulty buttons, so the selected one is highlighted
@@ -217,6 +226,39 @@ document.querySelectorAll('#difficulty-selection .difficulty').forEach(button =>
         button.classList.add('selected');
     });
 });
+
+document.getElementById('ai-button').addEventListener('click', function() {
+    currentOpponent = 'AI';          // Set the game mode to AI
+    updateOpponentSelection();       // Update the UI and reset the board based on the new mode
+});
+
+document.getElementById('multiplayer-button').addEventListener('click', function() {
+    currentOpponent = 'Player';      // Set the game mode to Player (multiplayer)
+    updateOpponentSelection();       // Update the UI and reset the board based on the new mode
+});
+
+// Function to update opponent selection based on the mode
+function updateOpponentSelection() {
+    console.log(`Current opponent: ${currentOpponent}`);
+
+    // Show the difficulty selection if the opponent is AI
+    if (currentOpponent === 'AI') {
+        document.getElementById('difficulty-selection').classList.remove('hidden');
+    }
+    else if (currentOpponent === 'Player') {
+        // Hide difficulty selection when the opponent is a player
+        document.getElementById('difficulty-selection').classList.add('hidden');
+    }
+
+    // Reset the board if the mode has changed (can also be done elsewhere, but this makes it clear)
+    resetBoard();   // Ensure the board is reset when switching between modes
+
+    // Update UI elements based on selected mode
+    if (currentOpponent === 'Player') {
+        // Handle multiplayer-specific logic (UI or internal state)
+        console.log('Multiplayer mode selected');
+    }
+}
 
 // Initialize game
 function setup() {
