@@ -64,7 +64,6 @@ button:hover {
 /* Go Board */
 #go-board {
     border: 1px solid #000;
-    margin-bottom: 20px;
     width: 100%; /* Make the board responsive */
     max-width: 570px; /* Limit the max size */
     flex-grow: 1; /* Allow the board to grow */
