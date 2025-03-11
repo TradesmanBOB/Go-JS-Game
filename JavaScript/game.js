@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d');
 
 // Board size
 const BOARD_SIZE = 19;
-const TILE_SIZE = 30;  // Each tile size in pixels
+const TILE_SIZE = canvas.width / BOARD_SIZE;  // Each tile size in pixels
 const STONE_RADIUS = TILE_SIZE / 2 - 3;  // Radius of the stone
 
 // Board state to track stone placements (null means empty)
@@ -44,6 +44,7 @@ function drawBoard() {
         ctx.lineTo(i * TILE_SIZE, canvas.height);
         ctx.stroke();
         
+        // draw horizontal lines
         ctx.beginPath();
         ctx.moveTo(0, i * TILE_SIZE);
         ctx.lineTo(canvas.width, i * TILE_SIZE);
@@ -115,8 +116,8 @@ canvas.addEventListener('click', function(event) {
     const rect = canvas.getBoundingClientRect();  // Get the position of the canvas relative to the page
     const mouseX = event.clientX - rect.left;  // Mouse X position within the canvas
     const mouseY = event.clientY - rect.top;   // Mouse Y position within the canvas
-
-    // Calculate the grid position based on mouse position
+    
+    // Fix for off-by-one issue with alignment
     const x = Math.floor(mouseX / TILE_SIZE);  // Convert mouseX to grid X position
     const y = Math.floor(mouseY / TILE_SIZE);  // Convert mouseY to grid Y position
 
