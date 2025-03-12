@@ -27,6 +27,7 @@ let gameOver = false;
 let isModeSelected = false;
 let isMultiplayer = false; // Track multiplayer mode
 let currentOpponent = null; // Variable to track the current opponent (AI or player)
+let selectedDifficulty = null; // Default to requirement a selected difficculty
 
 // Set canvas size according to grid size
 canvas.width = BOARD_SIZE * TILE_SIZE;
@@ -52,6 +53,64 @@ function drawBoard() {
     }
 }
 
+// Mode Selection Buttons
+document.getElementById('ai-button').addEventListener('click', function() {
+    if (isModeSelected && !isMultiplayer) return;
+    isModeSelected = true;
+    isMultiplayer = false;
+    currentOpponent = 'AI';
+    resetBoard();
+    updateButtonSelection(this);
+
+    // show difficulty selection after selecting ai mode
+    updateOpponentSelection();
+});
+
+document.getElementById('multiplayer-button').addEventListener('click', function() {
+    if (isModeSelected && isMultiplayer) return;
+    isModeSelected = true;
+    isMultiplayer = true;
+    currentOpponent = 'Player';
+    resetBoard();
+    updateButtonSelection(this);
+});
+
+// Update the button highlight on mode selection
+function updateButtonSelection(selectedButton) {
+    document.querySelectorAll('.opponent').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    selectedButton.classList.add('selected');
+}
+
+// Difficulty Buttons Logic
+document.querySelectorAll('#difficulty-selection .difficulty').forEach(button => {
+    button.addEventListener('click', () => {
+        // Remove 'selected' class from all difficulty buttons
+        document.querySelectorAll('#difficulty-selection .difficulty').forEach(btn => btn.classList.remove('selected'));
+        
+        // Add 'selected' class to the clicked difficulty button
+        button.classList.add('selected');
+
+        // set selected difficulty from button's data-difficulty attribute
+        selectedDifficulty = button.getAttribute('data-difficulty');  // 'easy', 'medium', or 'hard'
+
+        // Log selected difficulty
+        console.log(`Selected Difficulty: ${selectedDifficulty}`);
+    });
+});
+
+// Function to update opponent selection based on the mode
+function updateOpponentSelection() {
+    console.log(`Current opponent: ${currentOpponent}`);
+    if (currentOpponent === 'AI') {
+        document.getElementById('difficulty-selection').classList.remove('hidden');
+    } else if (currentOpponent === 'Player') {
+        document.getElementById('difficulty-selection').classList.add('hidden');
+    }
+    resetBoard();
+}
+
 // Draw a stone on the board
 function drawStone(x, y, color) {
     ctx.beginPath();
@@ -73,7 +132,6 @@ function drawAllStones() {
 
 // Function to update the displayed count of captured stones
 function updateCapturedStones() {
-    // update the captured stone counts for both black and white players
     document.getElementById('captured-black').textContent = capturedBlack;
     document.getElementById('captured-white').textContent = capturedWhite;
 }
@@ -92,21 +150,38 @@ function placeStone(x, y) {
         }
 
         previousBoardState = JSON.stringify(board);
+
+        // handle captures
         checkCaptures(x, y);
 
+        // check suicides
         if (isSuicide(x, y)) {
             board[y][x] = null;
             return;
         }
 
+        // draw board and update everything
         drawBoard();
         drawAllStones();
         
+        // switch turn
         currentTurn = currentTurn === "black" ? "white" : "black";
+
+        // Update turn and captured stone count
         updateTurnDisplay();
         updateCapturedStones();
+
+        // Check if winner
         checkWinner();
+
+        // After player's move, if the opponent is AI, trigger AI' move
+        handleTurn();
     }
+}
+
+// Function to update the turn display
+function updateTurnDisplay() {
+    document.getElementById('current-turn').textContent = currentTurn.charAt(0).toUpperCase() + currentTurn.slice(1);
 }
 
 // Add event listener to make the board interactive
@@ -181,10 +256,12 @@ function getGroup(x, y, color) {
 // Check for winner
 function checkWinner() {
     if (capturedBlack >= 10) {
-        document.getElementById('winner-message').textContent = "White wins!";
+        document.getElementById('winner-message').textContent = `White wins by ${capturedBlack} points!`;
+        document.getElementById('winner-display').classList.add('show'); // show the winner display
         gameOver = true;  // Prevent any more moves after a winner is declared
     } else if (capturedWhite >= 10) {
-        document.getElementById('winner-message').textContent = "Black wins!";
+        document.getElementById('winner-message').textContent = `Black wins by ${capturedWhite} points!`;
+        document.getElementById('winner-display').classList.add('show'); // show the winner display
         gameOver = true;  // Prevent any more moves after a winner is declared
     }
 }
@@ -194,7 +271,6 @@ function isSuicide(x, y) {
     const color = board[y][x];
     const opponent = color === 'black' ? 'white' : 'black';
     
-    // Check all directions for liberties
     const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
     for (let [dx, dy] of directions) {
         const nx = x + dx;
@@ -204,7 +280,6 @@ function isSuicide(x, y) {
                 return false;  // There's an empty space (liberty), so it's not suicide
             }
             if (board[ny][nx] === opponent) {
-                // If it's an opponent stone, check if it has liberties
                 if (hasLiberties(nx, ny) > 0) {
                     return false;  // Opponent's group has liberties, so it's not suicide
                 }
@@ -243,15 +318,12 @@ function hasLiberties(x, y) {
 
 // Reset board to initial state
 function resetBoard() {
-    // Reset board state
     board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
-
     capturedBlack = 0;
     capturedWhite = 0;
     currentTurn = "black";
     previousBoardState = JSON.stringify(board);
-
-    gameOver = false;  // Ensure the game isn't over when switching modes
+    gameOver = false;
     drawBoard();
     drawAllStones();
     updateTurnDisplay();
@@ -262,70 +334,44 @@ document.getElementById('reset-button').addEventListener('click', function() {
     resetBoard();
 });
 
-// Mode Selection
-document.getElementById('ai-button').addEventListener('click', function() {
-    if (isModeSelected && !isMultiplayer) return;  // Prevent multiple clicks
-    isModeSelected = true;
-    isMultiplayer = false; // Disable multiplayer mode
-    currentOpponent = 'AI'; // Set opponent to AI
-    resetBoard(); // Reset the board when switching to AI mode
-    updateOpponentSelection();  // Update UI if needed (e.g., difficulty selection or turn indicator)
-    updateButtonSelection(this);
-});
+// AI Shenanigans
+// simple ai move functin for 'easy' difficulty
+function aiMove() {
+    if (gameOver || currentOpponent !== 'AI') return;  // Don't allow AI to move if game is over or if not playing against AI
+    
+    if (selectedDifficulty === 'easy') {
+        easyAI();
+    } else if (selectedDifficulty === 'medium') {
+        mediumAI();
+    } else if (selectedDifficulty === 'hard') {
+        hardAI();
 
-document.getElementById('multiplayer-button').addEventListener('click', function() {
-    if (isModeSelected && isMultiplayer) return;  // Prevent multiple clicks
-    isModeSelected = true;
-    isMultiplayer = true; // Enable multiplayer mode
-    currentOpponent = 'Player'; // Set opponent to Player (Multiplayer)
-    resetBoard(); // Reset the board when switching to multiplayer mode
-    updateOpponentSelection();  // Update UI if needed (e.g., difficulty selection or turn indicator)
-    updateButtonSelection(this);
-});
-
-// Update the button highlight on mode selection
-function updateButtonSelection(button) {
-    document.querySelectorAll('.opponent').forEach(btn => {
-        btn.classList.remove('selected');
-    });
-    button.classList.add('selected');
-}
-
-// Adding event listeners to the difficulty buttons, so the selected one is highlighted
-document.querySelectorAll('#difficulty-selection .difficulty').forEach(button => {
-    button.addEventListener('click', () => {
-        // Remove 'selected' class from all difficulty buttons
-        document.querySelectorAll('#difficulty-selection .difficulty').forEach(btn => btn.classList.remove('selected'));
-        // Add 'selected' class to clicked difficulty button
-        button.classList.add('selected');
-    });
-});
-
-// Function to update opponent selection based on the mode
-function updateOpponentSelection() {
-    console.log(`Current opponent: ${currentOpponent}`);
-
-    // Show the difficulty selection if the opponent is AI
-    if (currentOpponent === 'AI') {
-        document.getElementById('difficulty-selection').classList.remove('hidden');
-    } else if (currentOpponent === 'Player') {
-        // Hide difficulty selection when the opponent is a player
-        document.getElementById('difficulty-selection').classList.add('hidden');
+    let availableMoves = [];
+    
+    // Find all empty spots on the board
+    for (let y = 0; y < BOARD_SIZE; y++) {
+        for (let x = 0; x < BOARD_SIZE; x++) {
+            if (!board[y][x]) {  // If the spot is empty
+                availableMoves.push({ x, y });
+            }
+        }
     }
 
-    // Reset the board if the mode has changed
-    resetBoard();  // Ensure the board is reset when switching between modes
-
-    // Update UI elements based on selected mode
-    if (currentOpponent === 'Player') {
-        console.log('Multiplayer mode selected');
+    // Pick a random move (can be improved with strategy later)
+    if (availableMoves.length > 0) {
+        const move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        placeStone(move.x, move.y);  // AI places its stone
     }
 }
 
-// Function to update the turn display
-function updateTurnDisplay() {
-    document.getElementById('current-turn').textContent = currentTurn.charAt(0).toUpperCase() + currentTurn.slice(1);  // Capitalize "black" or "white"
+// Call AI move after player turn
+function handleTurn() {
+    // If it's the AI's turn, make the AI move
+    if (currentOpponent === 'AI' && currentTurn === 'white') {
+        aiMove();
+    }
 }
+
 
 // Initialize game
 function setup() {

@@ -65,7 +65,9 @@ button:hover {
 #go-board {
     border: 1px solid #000;
     width: 100%; /* Make the board responsive */
-    max-width: 570px; /* Limit the max size */
+    max-width: 600px; /* Limit the max size */
+    height: 100%;
+    max-height: 600px;
     flex-grow: 1; /* Allow the board to grow */
     pointer-events: auto; /* Ensure the board is interactable by default */
 }
@@ -77,7 +79,7 @@ button:hover {
     left: 50%; /* Center horizontally */
     transform: translate(-50%, -50%); /* Center properly */
     width: 600px; /* Same width as the board */
-    height: 300px; /* Half the height of the board */
+    height: 300px; /* 2/3 the height of the board */
     background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
     color: #5af700;
     font-size: 2rem;
@@ -166,4 +168,9 @@ button.selected {
     background-color: #018306; /* Green when selected */
     color: white;
     font-weight: bold;
+    border: 2px solid #016f1d;
+}
+
+button.selected:hover {
+    background-color: #016f1d;
 }
