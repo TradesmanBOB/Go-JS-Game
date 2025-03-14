@@ -1,3 +1,5 @@
+console.log("JavaScript Loaded"); // Check if script is executing
+
 // Get the canvas and context
 const canvas = document.getElementById('go-board');
 const ctx = canvas.getContext('2d');
@@ -53,27 +55,40 @@ function drawBoard() {
     }
 }
 
-// Mode Selection Buttons
 document.getElementById('ai-button').addEventListener('click', function() {
-    if (isModeSelected && !isMultiplayer) return;
-    isModeSelected = true;
-    isMultiplayer = false;
-    currentOpponent = 'AI';
-    resetBoard();
-    updateButtonSelection(this);
-
-    // show difficulty selection after selecting ai mode
-    updateOpponentSelection();
+    if (currentOpponent === 'AI') {
+        // Deselect if already selected
+        isModeSelected = false;
+        currentOpponent = null;
+        this.classList.remove('selected');
+        document.getElementById('difficulty-selection').classList.add('hidden'); // Hide difficulty options
+    } else {
+        isModeSelected = true;
+        isMultiplayer = false;
+        currentOpponent = 'AI';
+        resetBoard();
+        updateButtonSelection(this);
+        updateOpponentSelection();
+    }
+    hideWinnerBox(); // Hide the winner message when switching modes
 });
 
 document.getElementById('multiplayer-button').addEventListener('click', function() {
-    if (isModeSelected && isMultiplayer) return;
-    isModeSelected = true;
-    isMultiplayer = true;
-    currentOpponent = 'Player';
-    resetBoard();
-    updateButtonSelection(this);
+    if (currentOpponent === 'Player') {
+        // Deselect if already selected
+        isModeSelected = false;
+        currentOpponent = null;
+        this.classList.remove('selected');
+    } else {
+        isModeSelected = true;
+        isMultiplayer = true;
+        currentOpponent = 'Player';
+        resetBoard();
+        updateButtonSelection(this);
+    }
+    hideWinnerBox(); // Hide the winner message when switching modes
 });
+
 
 // Update the button highlight on mode selection
 function updateButtonSelection(selectedButton) {
@@ -85,18 +100,22 @@ function updateButtonSelection(selectedButton) {
 
 // Difficulty Buttons Logic
 document.querySelectorAll('#difficulty-selection .difficulty').forEach(button => {
-    button.addEventListener('click', () => {
-        // Remove 'selected' class from all difficulty buttons
-        document.querySelectorAll('#difficulty-selection .difficulty').forEach(btn => btn.classList.remove('selected'));
-        
-        // Add 'selected' class to the clicked difficulty button
-        button.classList.add('selected');
+    button.addEventListener('click', function() {  // Use a regular function instead of an arrow function
+        if (this.classList.contains('selected')) {
+            // Deselect if already selected
+            this.classList.remove('selected');
+            selectedDifficulty = null;
+            console.log("Deselected AI Difficulty");
+        } else {
+            // Remove 'selected' class from all difficulty buttons
+            document.querySelectorAll('#difficulty-selection .difficulty').forEach(btn => btn.classList.remove('selected'));
 
-        // set selected difficulty from button's data-difficulty attribute
-        selectedDifficulty = button.getAttribute('data-difficulty');  // 'easy', 'medium', or 'hard'
+            // Add 'selected' class to the clicked difficulty button
+            this.classList.add('selected');
+            selectedDifficulty = this.getAttribute('data-difficulty');  // 'easy', 'medium', or 'hard'
 
-        // Log selected difficulty
-        console.log(`Selected Difficulty: ${selectedDifficulty}`);
+            console.log(`Selected Difficulty: ${selectedDifficulty}`);
+        }
     });
 });
 
@@ -266,6 +285,13 @@ function checkWinner() {
     }
 }
 
+// Hide Winner Box
+function hideWinnerBox() {
+    document.getElementById('winner-display').classList.remove('show'); // Hide the winner display
+    document.getElementById('winner-message').textContent = ''; // Clear winner text
+}
+
+
 // Check if placing a stone would result in suicide (no liberties left)
 function isSuicide(x, y) {
     const color = board[y][x];
@@ -324,6 +350,7 @@ function resetBoard() {
     currentTurn = "black";
     previousBoardState = JSON.stringify(board);
     gameOver = false;
+    hideWinnerBox();
     drawBoard();
     drawAllStones();
     updateTurnDisplay();
@@ -335,42 +362,7 @@ document.getElementById('reset-button').addEventListener('click', function() {
 });
 
 // AI Shenanigans
-// simple ai move functin for 'easy' difficulty
-function aiMove() {
-    if (gameOver || currentOpponent !== 'AI') return;  // Don't allow AI to move if game is over or if not playing against AI
-    
-    if (selectedDifficulty === 'easy') {
-        easyAI();
-    } else if (selectedDifficulty === 'medium') {
-        mediumAI();
-    } else if (selectedDifficulty === 'hard') {
-        hardAI();
-
-    let availableMoves = [];
-    
-    // Find all empty spots on the board
-    for (let y = 0; y < BOARD_SIZE; y++) {
-        for (let x = 0; x < BOARD_SIZE; x++) {
-            if (!board[y][x]) {  // If the spot is empty
-                availableMoves.push({ x, y });
-            }
-        }
-    }
-
-    // Pick a random move (can be improved with strategy later)
-    if (availableMoves.length > 0) {
-        const move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-        placeStone(move.x, move.y);  // AI places its stone
-    }
-}
-
-// Call AI move after player turn
-function handleTurn() {
-    // If it's the AI's turn, make the AI move
-    if (currentOpponent === 'AI' && currentTurn === 'white') {
-        aiMove();
-    }
-}
+// AI logic for different difficulty levels not yet implemented due to consistent erroring
 
 
 // Initialize game
